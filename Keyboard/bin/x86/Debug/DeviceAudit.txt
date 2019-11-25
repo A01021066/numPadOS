@@ -1,7 +1,7 @@
 Device
  DeviceName: \\?\HID#VID_0C45&PID_7603&MI_00#7&1ef67e22&0&0000#{884b96c3-56ef-11d1-bc8c-00a0c91405dd}
  DeviceType: KEYBOARD
- DeviceHandle: 1960787
+ DeviceHandle: 3060971
  Name: HID Keyboard Device
 
 DeviceInfo
@@ -27,7 +27,7 @@ HidInfo
 Device
  DeviceName: \\?\HID#VID_0C45&PID_7603&MI_01#7&32269a60&0&0000#{4d1e55b2-f16f-11cf-88cb-001111000030}
  DeviceType: HID
- DeviceHandle: A09F5
+ DeviceHandle: 24B0A2B
  Name: HID-compliant consumer control device
 
 DeviceInfo

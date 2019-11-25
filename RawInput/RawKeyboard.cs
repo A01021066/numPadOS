@@ -168,11 +168,30 @@ namespace RawInput_dll
                     if (process.ProcessName == "Spotify" && !String.IsNullOrEmpty(process.MainWindowTitle))
                         pID = process.Id;
                 }
+                //Console.WriteLine(keyPressEvent.VKeyName);
 
                 if (pID == 0)
                     return;
+                float? currentVolume = VolumeMixer.GetApplicationVolume(pID);
+                float minVolume = 0;
+                float maxVolume = 100;
+                //Console.WriteLine(currentVolume);
+                if (keyPressEvent.VKeyName == "NUMPAD8")
+                {
+                    if (currentVolume < maxVolume - 5f)
+                    {
+                        maxVolume = (float)currentVolume + 5f;
+                    }
+                    VolumeMixer.SetApplicationVolume(pID, maxVolume);
+                } else if (keyPressEvent.VKeyName == "NUMPAD2")
+                {
+                    if (currentVolume > minVolume + 5f)
+                    {
+                        minVolume = (float)currentVolume - 5f;
+                    }
+                    VolumeMixer.SetApplicationVolume(pID, minVolume);
+                } 
 
-                VolumeMixer.SetApplicationVolume(pID, 0f);
                 KeyPressed(this, new RawInputEventArg(keyPressEvent));
 
             }

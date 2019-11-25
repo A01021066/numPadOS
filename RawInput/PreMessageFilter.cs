@@ -13,7 +13,6 @@ namespace RawInput_dll
 
         public bool PreFilterMessage(ref Message m)
         {
-
             return false;
                 //m.Msg == Win32.WM_KEYDOWN;
         }
