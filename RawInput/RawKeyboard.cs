@@ -4,14 +4,23 @@ using System.Globalization;
 using System.ComponentModel;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Windows.Forms;
+
 
 namespace RawInput_dll
 {
     public sealed class RawKeyboard
     {
+        [DllImport("user32.dll")]
+        public static extern void keybd_event(byte virtualKey, byte scanCode, uint flags, IntPtr extraInfo);
         private readonly Dictionary<IntPtr, KeyPressEvent> _deviceList = new Dictionary<IntPtr, KeyPressEvent>();
         public delegate void DeviceEventHandler(object sender, RawInputEventArg e);
         public event DeviceEventHandler KeyPressed;
+        public const int KEYEVENTF_EXTENTEDKEY = 1;
+        public const int KEYEVENTF_KEYUP = 0;
+        public const int VK_MEDIA_NEXT_TRACK = 0xB0;// code to jump to next track
+        public const int VK_MEDIA_PLAY_PAUSE = 0xB3;// code to play or pause a song
+        public const int VK_MEDIA_PREV_TRACK = 0xB1;// code to jump to prev track
         private string appName;
         readonly object _padLock = new object();
 
@@ -159,7 +168,7 @@ namespace RawInput_dll
             keyPressEvent.VKeyName = KeyMapper.GetKeyName(VirtualKeyCorrection(virtualKey, isE0BitSet, makeCode)).ToUpper();
             keyPressEvent.VKey = virtualKey;
 
-            if (KeyPressed != null && keyPressEvent.Source == "Keyboard_01")
+            if (KeyPressed != null && keyPressEvent.Source == "Keyboard_01" && keyPressEvent.Message == 0x0100)
             {
                 //WORKED YES
                 var pID = 0;
@@ -176,24 +185,43 @@ namespace RawInput_dll
                 float minVolume = 0;
                 float maxVolume = 100;
                 //Console.WriteLine(currentVolume);
-                if (keyPressEvent.VKeyName == "NUMPAD8")
-                {
-                    if (currentVolume < maxVolume - 5f)
-                    {
+                if (keyPressEvent.VKeyName == "NUMPAD8") {
+                    if (currentVolume < maxVolume - 5f) {
                         maxVolume = (float)currentVolume + 5f;
                     }
                     VolumeMixer.SetApplicationVolume(pID, maxVolume);
-                } else if (keyPressEvent.VKeyName == "NUMPAD2")
-                {
+                } else if (keyPressEvent.VKeyName == "NUMPAD2") {
                     if (currentVolume > minVolume + 5f)
                     {
                         minVolume = (float)currentVolume - 5f;
                     }
                     VolumeMixer.SetApplicationVolume(pID, minVolume);
-                } 
+                } else if (keyPressEvent.VKeyName == "NUMPAD5") {
+                    // Play or Pause music
+                    keybd_event(VK_MEDIA_PLAY_PAUSE, 0, KEYEVENTF_EXTENTEDKEY, IntPtr.Zero);
+                }
+                else if (keyPressEvent.VKeyName == "NUMPAD4")
+                {
+                    // Jump to previous track
+                    keybd_event(VK_MEDIA_PREV_TRACK, 0, KEYEVENTF_EXTENTEDKEY, IntPtr.Zero);
 
-                KeyPressed(this, new RawInputEventArg(keyPressEvent));
-
+                }
+                else if (keyPressEvent.VKeyName == "NUMPAD6")
+                {
+                    // Jump to next track
+                    keybd_event(VK_MEDIA_NEXT_TRACK, 0, KEYEVENTF_EXTENTEDKEY, IntPtr.Zero);
+                } else if (keyPressEvent.VKeyName == "NUMPAD0")
+                {
+                    //mute
+                    if (VolumeMixer.GetApplicationMute(pID) == false)
+                    {
+                        VolumeMixer.SetApplicationMute(pID, true);
+                    } else
+                    {
+                        VolumeMixer.SetApplicationMute(pID, false);
+                    }
+                    // VolumeMixer.GetApplicationMute(pID) == false ? VolumeMixer.SetApplicationMute(pID, true) : VolumeMixer.SetApplicationMute(pID, false);
+                }
             }
             else
             {

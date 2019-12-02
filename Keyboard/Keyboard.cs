@@ -11,14 +11,14 @@ namespace Keyboard
     {
         private readonly RawInput _rawinput;
         
-        const bool CaptureOnlyInForeground = true;
+        const bool CaptureOnlyInForeground = false;
         // Todo: add checkbox to form when checked/uncheck create method to call that does the same as Keyboard ctor 
 
         public Keyboard()
         {
             InitializeComponent();
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
-
+            
             _rawinput = new RawInput(Handle, CaptureOnlyInForeground);
            
             _rawinput.AddMessageFilter();   // Adding a message filter will cause keypresses to be handled
